@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retro Dodge</title>
+<style>
+body{
+margin:0;
+background:black;
+color:white;
+font-family:monospace;
+text-align:center;
+}
+canvas{
+background:#111;
+display:block;
+margin:auto;
+border:4px solid white;
+max-width:100%;
+height:auto;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Retro Dodge</h2>
+<p>PC: ← → | Mobil: klepni vlevo / vpravo</p>
+
+<canvas id="game" width="400" height="600"></canvas>
+
+<script>
+
+const canvas = document.getElementById("game")
+const ctx = canvas.getContext("2d")
+
+let player = {
+x:180,
+y:550,
+w:40,
+h:40,
+speed:6
+}
+
+let blocks=[]
+let score=0
+
+function spawnBlock(){
+blocks.push({
+x:Math.random()*360,
+y:-40,
+w:40,
+h:40,
+speed:3+score*0.01
+})
+}
+
+setInterval(spawnBlock,900)
+
+document.addEventListener("keydown",e=>{
+if(e.key==="ArrowLeft") player.x-=player.speed
+if(e.key==="ArrowRight") player.x+=player.speed
+})
+
+canvas.addEventListener("touchstart",e=>{
+let x=e.touches[0].clientX
+if(x<window.innerWidth/2) player.x-=40
+else player.x+=40
+})
+
+function update(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+ctx.fillStyle="lime"
+ctx.fillRect(player.x,player.y,player.w,player.h)
+
+for(let i=0;i<blocks.length;i++){
+
+let b=blocks[i]
+b.y+=b.speed
+
+ctx.fillStyle="red"
+ctx.fillRect(b.x,b.y,b.w,b.h)
+
+if(
+player.x < b.x+b.w &&
+player.x+player.w > b.x &&
+player.y < b.y+b.h &&
+player.y+player.h > b.y
+){
+alert("Game Over! Score: "+score)
+location.reload()
+}
+
+if(b.y>600){
+blocks.splice(i,1)
+score++
+}
+}
+
+ctx.fillStyle="white"
+ctx.font="20px monospace"
+ctx.fillText("Score: "+score,10,30)
+
+requestAnimationFrame(update)
+}
+
+update()
+
+</script>
+
+</body>
+</html>
